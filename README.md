@@ -4,9 +4,11 @@ HMI V2 is a React, TypeScript, and Vite application for building a modern human-
 
 ## Table of Contents
 
-- [Getting Started](#getting-started)
-- [Project Folder Structure](#project-folder-structure)
-- [Available Scripts](#available-scripts)
+| Section | Description |
+| --- | --- |
+| [Getting Started](#getting-started) | Clone the repository, create or switch branches, install dependencies, and run the development server. |
+| [Project Folder Structure](#project-folder-structure) | View the main folders and files used in the project. |
+| [Available Scripts](#available-scripts) | See the npm scripts available for development, build, linting, and preview. |
 
 ## Getting Started
 
