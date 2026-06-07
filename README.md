@@ -1,73 +1,114 @@
-# React + TypeScript + Vite
+# HMI V2
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+HMI V2 is a React, TypeScript, and Vite application for building a modern human-machine interface dashboard. The project includes routed pages, reusable UI components, form validation, and Tailwind CSS styling.
 
-Currently, two official plugins are available:
+## Table of Contents
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- [Getting Started](#getting-started)
+- [Project Folder Structure](#project-folder-structure)
+- [Available Scripts](#available-scripts)
 
-## React Compiler
+## Getting Started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Clone the Repository
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+git clone https://github.com/KeionDz/HMI-V2.git
+cd HMI-V2
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Create or Switch Branches
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+Create a new branch:
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+git switch -c your-branch-name
+```
+
+Switch to an existing branch:
+
+```bash
+git switch your-branch-name
+```
+
+### Install Dependencies
+
+```bash
+npm i
+```
+
+### Run the Development Server
+
+```bash
+npm run dev
+```
+
+The app runs locally at:
+
+```text
+http://localhost:5173
+```
+
+If port `5173` is already in use, Vite will show the available localhost URL in the terminal.
+
+## Project Folder Structure
+
+```text
+HMI-V2/
++-- public/
+|   +-- favicon.svg
+|   +-- icons.svg
++-- src/
+|   +-- assets/
+|   |   +-- hero.png
+|   |   +-- react.svg
+|   |   +-- vite.svg
+|   +-- components/
+|   |   +-- layout/
+|   |   |   +-- navbar.tsx
+|   |   +-- pages/
+|   |   |   +-- home.tsx
+|   |   |   +-- login-page.tsx
+|   |   +-- sections/
+|   |   |   +-- camera-feed.tsx
+|   |   |   +-- pallet-manager.tsx
+|   |   |   +-- test-section.tsx
+|   |   +-- ui/
+|   |       +-- button.tsx
+|   |       +-- card.tsx
+|   |       +-- field.tsx
+|   |       +-- input.tsx
+|   |       +-- label.tsx
+|   |       +-- layer-selector.tsx
+|   |       +-- login-form.tsx
+|   |       +-- navigation-menu.tsx
+|   |       +-- separator.tsx
+|   |       +-- stat-card.tsx
+|   +-- lib/
+|   |   +-- utils.ts
+|   +-- routes/
+|   |   +-- app-routes.tsx
+|   +-- schemas/
+|   |   +-- login-schema.ts
+|   +-- App.css
+|   +-- index.css
+|   +-- main.tsx
++-- components.json
++-- eslint.config.js
++-- index.html
++-- package-lock.json
++-- package.json
++-- tsconfig.app.json
++-- tsconfig.json
++-- tsconfig.node.json
++-- vite.config.ts
+```
+
+## Available Scripts
+
+```bash
+npm run dev
+npm run build
+npm run lint
+npm run preview
 ```
