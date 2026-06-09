@@ -1,14 +1,11 @@
-import { Package } from "lucide-react";
+import { Package, Plus, X } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useState, useMemo } from "react";
 import { StatCard } from "@/components/ui/stat-card";
-import { LayerSelector } from "@/components/ui/layer-selector";
 import { type SelectedPallet } from "@/components/sections/camera-feed";
 
-// Mock pallets for demonstration purposes
 const MOCK_PALLETS = [
-  // Layer 1
   { id: 1,  layer: 1, name: "Pallet 1",  label: "Pallet 01", active: true,  description: "Standard euro-pallet loaded with automotive parts. Destination: Bay A3." },
   { id: 2,  layer: 1, name: "Pallet 2",  label: "Pallet 02", active: true,  description: "Fragile glassware shipment. Handle with care. Destination: Bay B1." },
   { id: 3,  layer: 1, name: "Pallet 3",  label: "Pallet 03", active: false, description: "Awaiting quality inspection. Do not load until cleared." },
@@ -21,7 +18,6 @@ const MOCK_PALLETS = [
   { id: 10, layer: 1, name: "Pallet 10", label: "Pallet 10", active: true,  description: "Retail display units. Pre-assembled. Destination: Showroom D." },
   { id: 11, layer: 1, name: "Pallet 11", label: "Pallet 11", active: false, description: "Damaged — pending returns processing." },
   { id: 12, layer: 1, name: "Pallet 12", label: "Pallet 12", active: true,  description: "Textile rolls. Keep dry. Destination: Storage Unit 7." },
-  // Layer 2
   { id: 13, layer: 2, name: "Pallet 1",  label: "Pallet 01", active: true,  description: "Machine parts order #4821. Destination: Assembly Line 2." },
   { id: 14, layer: 2, name: "Pallet 2",  label: "Pallet 02", active: false, description: "Awaiting forklift certification check." },
   { id: 15, layer: 2, name: "Pallet 3",  label: "Pallet 03", active: true,  description: "Pharmaceutical supplies. Temperature-controlled transit required." },
@@ -34,7 +30,6 @@ const MOCK_PALLETS = [
   { id: 22, layer: 2, name: "Pallet 10", label: "Pallet 10", active: true,  description: "Consumer electronics. High-value cargo. Requires escort." },
   { id: 23, layer: 2, name: "Pallet 11", label: "Pallet 11", active: true,  description: "Beverages — glass bottles. Upright position only." },
   { id: 24, layer: 2, name: "Pallet 12", label: "Pallet 12", active: false, description: "Reserved — VIP client order." },
-  // Layer 3
   { id: 25, layer: 3, name: "Pallet 1",  label: "Pallet 01", active: true,  description: "Raw timber. Forklift access from south side only." },
   { id: 26, layer: 3, name: "Pallet 2",  label: "Pallet 02", active: true,  description: "Paint cans — flammable. Keep away from heat sources." },
   { id: 27, layer: 3, name: "Pallet 3",  label: "Pallet 03", active: false, description: "Pending weight verification." },
@@ -49,34 +44,53 @@ const MOCK_PALLETS = [
   { id: 36, layer: 3, name: "Pallet 12", label: "Pallet 12", active: false, description: "Reserved — loading dock 4 conflict. Resolve before use." },
 ];
 
-// PalletManager component
 interface PalletManagerProps {
   onPalletSelect: (pallet: SelectedPallet | null) => void;
   selectedPalletId: number | null;
+  isAdmin?: boolean;
+  onAddNewPalletClick?: () => void;
 }
- 
-export function PalletManager({ onPalletSelect, selectedPalletId }: PalletManagerProps) {
+
+export function PalletManager({ onPalletSelect, selectedPalletId, isAdmin = false, onAddNewPalletClick }: PalletManagerProps) {
+  const [layers, setLayers] = useState([1, 2, 3]);
   const [activeLayer, setActiveLayer] = useState(1);
-  const totalLayersList = [1, 2, 3];
- 
+
   const currentLayerPallets = useMemo(
     () => MOCK_PALLETS.filter((p) => p.layer === activeLayer),
     [activeLayer]
   );
- 
+
   const activePalletsCount = currentLayerPallets.filter((p) => p.active).length;
- 
+
   function handlePalletClick(pallet: (typeof MOCK_PALLETS)[number]) {
     if (!pallet.active) return;
     if (pallet.id === selectedPalletId) {
-      onPalletSelect(null); // deselect on second click
+      onPalletSelect(null);
     } else {
       onPalletSelect({ id: pallet.id, label: pallet.label, description: pallet.description });
     }
   }
- 
+
+  function handleAddLayer() {
+    const next = layers.length + 1;
+    setLayers((prev) => [...prev, next]);
+    setActiveLayer(next);
+    onPalletSelect(null);
+  }
+
+  function handleDeleteLayer(layerToDelete: number) {
+    if (layers.length === 1) return;
+    const updated = layers.filter((l) => l !== layerToDelete);
+    setLayers(updated);
+    if (activeLayer === layerToDelete) {
+      const idx = layers.indexOf(layerToDelete);
+      setActiveLayer(updated[Math.max(0, idx - 1)]);
+    }
+    onPalletSelect(null);
+  }
+
   return (
-    <section className="flex flex-col h-full lg:w-1/2 pr-0 lg:pr-6 py-6 gap-12">
+    <section className="flex flex-col w-full h-full gap-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold tracking-tight">Pallet Manager</h2>
         <div className="flex items-center gap-4 text-sm font-medium text-muted-foreground">
@@ -90,24 +104,57 @@ export function PalletManager({ onPalletSelect, selectedPalletId }: PalletManage
           </div>
         </div>
       </div>
- 
+
       <div className="grid grid-cols-2 gap-4">
         <StatCard title="Active Pallets" value={`${activePalletsCount}/${currentLayerPallets.length}`} />
-        <StatCard title="Total Layers" value={totalLayersList.length} />
+        <StatCard title="Total Layers" value={layers.length} />
       </div>
- 
-      <div className="w-full">
-        <LayerSelector
-          layers={totalLayersList}
-          activeLayer={activeLayer}
-          onLayerChange={(layer) => {
-            setActiveLayer(layer);
-            onPalletSelect(null); // clear selection when switching layers
-          }}
-        />
+
+      {/* Layer Tabs */}
+      <div className="flex items-center gap-2 w-full">
+        <div className="flex flex-1 rounded-full bg-zinc-900 p-1 gap-1">
+          {layers.map((layer) => {
+            const isActive = layer === activeLayer;
+            return (
+              <button
+                key={layer}
+                onClick={() => { setActiveLayer(layer); onPalletSelect(null); }}
+                className={`flex-1 flex items-center justify-between px-3 py-1.5 rounded-full text-sm font-medium transition-colors
+                  ${isActive
+                    ? "bg-zinc-700 text-foreground"
+                    : "text-muted-foreground hover:text-foreground"
+                  }`}
+              >
+                {isAdmin && isActive && layers.length > 1 ? <span className="w-4 h-4 shrink-0" /> : null}
+                <span className="flex-1 text-center">Layer {layer}</span>
+                {isAdmin && isActive && layers.length > 1 && (
+                  <span
+                    role="button"
+                    onClick={(e) => { e.stopPropagation(); handleDeleteLayer(layer); }}
+                    title="Delete layer"
+                    className="w-4 h-4 rounded-full bg-zinc-500 hover:bg-red-500 flex items-center justify-center transition-colors shrink-0"
+                  >
+                    <X className="w-2.5 h-2.5 text-white" />
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+
+        {isAdmin && (
+          <button
+            onClick={handleAddLayer}
+            className="shrink-0 w-8 h-8 rounded-full border border-border/50 bg-black hover:bg-zinc-900 text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors"
+            title="Add layer"
+          >
+            <Plus className="w-4 h-4" />
+          </button>
+        )}
       </div>
- 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 flex-1 content-start">
+
+      {/* Pallet Cards Grid Container */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 content-start pb-6">
         {currentLayerPallets.map((pallet) => {
           const isSelected = pallet.id === selectedPalletId;
           return (
@@ -119,7 +166,9 @@ export function PalletManager({ onPalletSelect, selectedPalletId }: PalletManage
                   ? isSelected
                     ? "cursor-pointer border-blue-500/70 bg-blue-950/40 ring-1 ring-blue-500/50"
                     : "cursor-pointer border-green-500/50 bg-black hover:bg-zinc-900"
-                  : "border-border/30 bg-black/50 opacity-50 cursor-not-allowed"
+                  : isAdmin
+                    ? "cursor-pointer border-border/30 bg-black/50 opacity-50 hover:opacity-70"
+                    : "border-border/30 bg-black/50 opacity-50 cursor-not-allowed"
               }`}
             >
               <CardContent className="flex flex-col items-center justify-center p-4 gap-2">
@@ -136,16 +185,36 @@ export function PalletManager({ onPalletSelect, selectedPalletId }: PalletManage
             </Card>
           );
         })}
+
+        {/* Action Placeholder: Add New Pallet */}
+        {isAdmin && (
+          <Card 
+            onClick={() => {
+              if (onAddNewPalletClick) onAddNewPalletClick();
+            }}
+            className="cursor-pointer border-dashed border-zinc-700 bg-zinc-950/30 hover:bg-zinc-900 hover:border-zinc-500 transition-all min-h-[106px] flex items-center justify-center"
+          >
+            <CardContent className="flex flex-col items-center justify-center p-4 gap-2 text-muted-foreground hover:text-foreground transition-colors">
+              <Plus className="w-6 h-6 stroke-[1.5]" />
+              <div className="text-center">
+                <span className="font-medium text-xs tracking-wide">Add New Pallet</span>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
- 
-      <div className="flex justify-start gap-3 mt-auto">
-        <button className="bg-black border border-border/50 hover:bg-zinc-900 text-foreground px-2 py-1 rounded-full font-medium text-sm transition-colors w-[140px]">
-          Load
-        </button>
-        <button className="bg-blue-600 border border-border/50 hover:bg-blue-700 text-white px-2 py-1 rounded-full font-medium text-sm transition-colors w-[140px]">
-          Retrieve
-        </button>
-      </div>
+
+      {/* Primary Actions Footer Panel */}
+      {!isAdmin && (
+        <div className="flex justify-start gap-3 pt-6 mt-auto">
+          <button className="bg-black border border-border/50 hover:bg-zinc-900 text-foreground px-2 py-1 rounded-full font-medium text-sm transition-colors w-[140px]">
+            Load
+          </button>
+          <button className="bg-blue-600 border border-border/50 hover:bg-blue-700 text-white px-2 py-1 rounded-full font-medium text-sm transition-colors w-[140px]">
+            Retrieve
+          </button>
+        </div>
+      )}
     </section>
   );
 }

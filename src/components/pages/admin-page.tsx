@@ -2,27 +2,26 @@ import { useState } from "react";
 import { Separator } from "@/components/ui/separator";
 import { PalletManager } from "../sections/pallet-manager";
 import { CameraFeed, type SelectedPallet } from "../sections/camera-feed";
-import AddNewPallet from "../sections/add-new-pallet";
+import AddNewPallet from "../sections/add-new-pallet"; // Don't forget to import this!
 
-export default function Home() {
+export default function AdminPage() {
   const [selectedPallet, setSelectedPallet] = useState<SelectedPallet | null>(null);
   const [isCreatingPallet, setIsCreatingPallet] = useState(false);
-  const isAdmin = false;
 
   return (
     <main className="flex flex-row flex-1 min-h-0">
-      {/* Left Column: Pallet Management Board */}
+      {/* Left Column: Admin Pallet Management Board */}
       <div className="flex flex-1 px-4 py-6 lg:px-8">
         <PalletManager
-          isAdmin={isAdmin}
+          isAdmin={true} // Explicitly passes true so admin capabilities show here
           selectedPalletId={selectedPallet?.id ?? null}
           onPalletSelect={(pallet) => {
-            setIsCreatingPallet(false); // Switch away from creation form
+            setIsCreatingPallet(false); // Close form if clicking a real asset card
             setSelectedPallet(pallet);
           }}
           onAddNewPalletClick={() => {
-            setSelectedPallet(null); // Clear selected item highlight
-            setIsCreatingPallet(true); // Open creation panel
+            setSelectedPallet(null); // Clear selected asset focus
+            setIsCreatingPallet(true); // Mount form state panel
           }}
         />
       </div>
@@ -35,13 +34,13 @@ export default function Home() {
           <AddNewPallet 
             onCancel={() => setIsCreatingPallet(false)}
             onSave={(newData) => {
-              console.log("New Pallet Payload Submitted:", newData);
+              console.log("Admin Dashboard - New Pallet Saved:", newData);
               setIsCreatingPallet(false);
             }}
           />
         ) : (
           <CameraFeed 
-            isAdmin={isAdmin} 
+            isAdmin={true} // Explicitly passes true to allow descriptions editing
             selectedPallet={selectedPallet} 
           />
         )}

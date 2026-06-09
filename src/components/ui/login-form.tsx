@@ -18,21 +18,21 @@ const LoginForm = ({ form, onSubmit }: LoginFormProps) => {
   } = form;
 
   return (
-    <div className="w-full max-w-md">
+    <div className="w-full max-w-2xl gap-10">
       <Card className="w-full shadow-sm">
         <CardTitle className="px-8 pt-8 text-center text-3xl font-semibold sm:px-10 sm:pt-10">
-          HMI
+          Eastworks HMI
         </CardTitle>
         <CardContent className="px-8 pb-8 pt-0 sm:px-10 sm:pb-10">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <FieldGroup className="gap-6">
               <Field>
-                <FieldLabel htmlFor="email">Email</FieldLabel>
+                <FieldLabel htmlFor="email">Username</FieldLabel>
                 <Input
                   className="h-10 px-3"
                   id="email"
-                  type="email"
-                  placeholder="name@example.com"
+                  type="text"
+                  placeholder="Enter admin username"
                   autoComplete="email"
                   {...register("email")}
                 />
@@ -47,6 +47,7 @@ const LoginForm = ({ form, onSubmit }: LoginFormProps) => {
                   className="h-10 px-3"
                   id="password"
                   type="password"
+                  placeholder="Enter admin password"
                   autoComplete="current-password"
                   {...register("password")}
                 />
@@ -55,13 +56,13 @@ const LoginForm = ({ form, onSubmit }: LoginFormProps) => {
                 )}
               </Field>
             </FieldGroup>
-            <Button
-              className="h-10 w-full"
-              type="submit"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Logging in..." : "Login"}
-            </Button>
+            <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full h-10 rounded-full bg-blue-500 text-foreground font-medium text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed mt-2 cursor-pointer"
+              >
+                {isSubmitting ? "Logging in..." : "Login as Administrator"}
+              </button>
           </form>
         </CardContent>
       </Card>
