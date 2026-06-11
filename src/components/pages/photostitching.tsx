@@ -26,7 +26,6 @@ export default function PhotoStitchingPage() {
       URL.createObjectURL(file)
     );
     setImagePreviews(objectUrls);
-    // Automatically select the first frame by default
     setActiveIndex(0);
 
     return () => {
@@ -35,14 +34,12 @@ export default function PhotoStitchingPage() {
   }, [selectedFiles]);
 
   // AUTOMATIC STITCH TRIGGER
-  // Fires immediately once selectedFiles updates with 2 or more files
   useEffect(() => {
     if (selectedFiles && selectedFiles.length >= 2) {
       handleUploadAndStitch();
     }
   }, [selectedFiles]);
 
-  // Keyboard navigation listener (Left / Right arrows)
   useEffect(() => {
     if (activeIndex === null || imagePreviews.length === 0) return;
 
@@ -80,10 +77,10 @@ export default function PhotoStitchingPage() {
     const diff = touchStart - currentTouch;
 
     if (diff > 50) {
-      handleNextImage(); // Swiped left -> Next
+      handleNextImage(); 
       setTouchStart(null);
     } else if (diff < -50) {
-      handlePrevImage(); // Swiped right -> Previous
+      handlePrevImage(); 
       setTouchStart(null);
     }
   };
@@ -102,7 +99,7 @@ export default function PhotoStitchingPage() {
 
     setLoading(true);
     setError(null);
-    setStitchedImage(null); // Reset previous image during new compilation
+    setStitchedImage(null);
     
     const formData = new FormData();
     Array.from(selectedFiles).forEach((file) => {
@@ -115,7 +112,6 @@ export default function PhotoStitchingPage() {
         body: formData,
       });
 
-      // Try parsing detailed message from your FastAPI server if response is not ok
       if (!response.ok) {
         try {
           const errData = await response.json();
@@ -130,7 +126,6 @@ export default function PhotoStitchingPage() {
       setStitchedImage(imageUrl);
     } catch (err: any) {
       console.error("Error processing images:", err);
-      // Ensure specific user-friendly error fallback text matches expectation
       if (err.message && err.message.includes("Failed to fetch")) {
         setError("ERR_CONNECTION_REFUSED: Could not connect to OpenCV backend server.");
       } else {
@@ -145,7 +140,6 @@ export default function PhotoStitchingPage() {
     <div className="flex flex-col h-screen overflow-hidden bg-background">
       <Navbar /> 
 
-      {/* Main Full-Height Dashboard Container */}
       <main className="flex-1 grid grid-cols-1 md:grid-cols-2 w-full h-full min-h-0">
         
         {/* LEFT PANEL: Controls & Settings */}
