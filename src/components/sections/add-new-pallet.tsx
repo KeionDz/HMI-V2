@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Camera, VideoOff } from "lucide-react";
 import { Label } from "@/components/ui/label";
+import { AddCameraRulesModal } from "@/components/ui/add-camera-rules-modal"; // Verify this path matches your directory setup
 
 interface AddNewPalletProps {
   onCancel: () => void;
@@ -13,6 +14,9 @@ export default function AddNewPallet({ onCancel, onSave }: AddNewPalletProps) {
   const [description, setDescription] = useState("");
   const [cameraUrl, setCameraUrl] = useState("");
   const [previewActive, setPreviewActive] = useState(false);
+  
+  // 1. New local state to manage the Camera Rules setup modal layout display
+  const [cameraRulesModalOpen, setCameraRulesModalOpen] = useState(false);
 
   function handleSave(e: React.FormEvent) {
     e.preventDefault();
@@ -22,7 +26,7 @@ export default function AddNewPallet({ onCancel, onSave }: AddNewPalletProps) {
   }
 
   return (
-    <section className="flex flex-col w-full h-full gap-12">
+    <section className="flex flex-col w-full h-full gap-6">
       <h2 className="text-2xl font-bold tracking-tight">Add New Pallet</h2>
 
       <form onSubmit={handleSave} className="flex flex-col flex-1 gap-4 overflow-y-auto pr-1">
@@ -75,7 +79,7 @@ export default function AddNewPallet({ onCancel, onSave }: AddNewPalletProps) {
         </div>
 
         {/* Video Preview Canvas Window */}
-        <div className="relative flex flex-col items-center justify-center border border-zinc-800 bg-[#1d2338] rounded-xl h-[300px] text-center px-4 mt-2">
+        <div className="relative flex flex-col items-center justify-center border border-zinc-800 bg-[#1d2338] rounded-xl h-[240px] text-center px-4 mt-2">
           {previewActive && cameraUrl ? (
             <div className="text-blue-400 flex flex-col items-center gap-2">
               <Camera className="w-8 h-8 animate-pulse" />
@@ -90,19 +94,18 @@ export default function AddNewPallet({ onCancel, onSave }: AddNewPalletProps) {
 
           {/* Sub-navigation pill menu inside video view */}
           <div className="absolute bottom-3 right-3 flex items-center bg-zinc-950 p-1 rounded-full border border-zinc-800 gap-1">
+            {/* 2. Added modal toggle switch trigger handling onto this tab action */}
             <button
               type="button"
-              onClick={() => setPreviewActive(false)}
-              className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
-                !previewActive ? "bg-zinc-700 text-foreground" : "text-zinc-400 hover:text-foreground"
-              }`}
+              onClick={() => setCameraRulesModalOpen(true)}
+              className="px-3 py-1 text-xs font-medium rounded-full bg-transparent text-zinc-400 hover:text-foreground transition-colors cursor-pointer"
             >
-              Camera Setup
+              Camera Rules
             </button>
             <button
               type="button"
               onClick={() => setPreviewActive(true)}
-              className={`px-3 py-1 text-xs font-medium rounded-full transition-colors ${
+              className={`px-3 py-1 text-xs font-medium rounded-full transition-colors cursor-pointer ${
                 previewActive ? "bg-zinc-700 text-foreground" : "text-zinc-400 hover:text-foreground"
               }`}
             >
@@ -116,18 +119,29 @@ export default function AddNewPallet({ onCancel, onSave }: AddNewPalletProps) {
           <button
             type="button"
             onClick={onCancel}
-            className="bg-black border border-zinc-800 hover:bg-zinc-900 text-foreground px-6 py-1 rounded-full font-medium text-sm transition-colors w-[130px]"
+            className="bg-black border border-zinc-800 hover:bg-zinc-900 text-foreground px-6 py-1.5 rounded-full font-medium text-sm transition-colors w-[150px]"
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="bg-blue-600 border border-border/50 hover:bg-blue-700 text-white px-4 py-1 rounded-full font-medium text-sm transition-colors w-[180px]"
+            className="bg-blue-600 border border-border/50 hover:bg-blue-700 text-white px-6 py-1.5 rounded-full font-medium text-sm transition-colors w-[150px]"
           >
             Save Changes
           </button>
         </div>
       </form>
+
+      {/* 3. Conditional injection gate mapping rule context modal overlay */}
+      {cameraRulesModalOpen && (
+        <AddCameraRulesModal
+          onClose={() => setCameraRulesModalOpen(false)}
+          onSave={(data) => {
+            console.log("Camera configurations saved to mock context payload:", data);
+            setCameraRulesModalOpen(false);
+          }}
+        />
+      )}
     </section>
   );
 }

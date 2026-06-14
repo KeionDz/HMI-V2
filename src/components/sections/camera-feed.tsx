@@ -38,7 +38,7 @@ export function CameraFeed({ selectedPallet, isAdmin = false, onUpdatePallet }: 
     <section className="flex flex-col w-full h-full gap-6">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold tracking-tight">Camera Feed</h2>
-        <div className="flex items-center gap-1.5 bg-blue-500/20 text-blue-500 px-2.5 py-1 rounded border border-blue-500/30 text-xs font-semibold">
+        <div className="cursor-pointer flex items-center gap-1.5 bg-blue-500/20 text-blue-500 px-2.5 py-1 rounded border border-blue-500/30 text-xs font-semibold">
           <Camera className="w-3.5 h-3.5" />
           Live
         </div>
