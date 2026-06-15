@@ -1,4 +1,4 @@
-import { Package, Plus, X } from "lucide-react";
+import { Package, Plus } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { useState, useMemo, useEffect } from "react";
@@ -112,7 +112,7 @@ export function PalletManager({ onPalletSelect, selectedPalletId, isAdmin = fals
     setProgress(0);
   }
 
-  function handleAddLayerConfirm(name: string, slots: number) {
+  function handleAddLayerConfirm(_name: string, slots: number) {
     const next = layers.length + 1;
     const maxId = pallets.length > 0 ? Math.max(...pallets.map((p) => p.id)) : 0;
     const newPallets = Array.from({ length: slots }, (_, i) => ({
