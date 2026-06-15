@@ -3,7 +3,6 @@ import { Input } from "./input";
 import { Field, FieldError, FieldGroup, FieldLabel } from "./field";
 import { type loginFormData } from "@/schemas/login-schema";
 import { type UseFormReturn } from "react-hook-form";
-import { Button } from "./button";
 
 interface LoginFormProps {
   form: UseFormReturn<loginFormData>;
