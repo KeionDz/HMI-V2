@@ -138,7 +138,6 @@ export default function PhotoStitchingPage() {
 
   return (
     <div className="flex flex-col h-screen overflow-hidden bg-background">
-      <Navbar /> 
 
       <main className="flex-1 grid grid-cols-1 md:grid-cols-2 w-full h-full min-h-0">
         
