@@ -1,6 +1,5 @@
 import React, { useState, useEffect, type TouchEvent } from "react";
 import { ImageIcon, Loader2, UploadCloud, ChevronLeft, ChevronRight, Eye, AlertTriangle } from "lucide-react";
-import { Navbar } from "@/components/layout/navbar"; 
 
 export default function PhotoStitchingPage() {
   const [selectedFiles, setSelectedFiles] = useState<FileList | null>(null);
