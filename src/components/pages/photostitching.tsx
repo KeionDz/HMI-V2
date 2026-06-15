@@ -106,7 +106,7 @@ export default function PhotoStitchingPage() {
     });
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/api/stitch", {
+      const response = await fetch("http://3.25.197.2:8000/api/stitch", {
         method: "POST",
         body: formData,
       });
