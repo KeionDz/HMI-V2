@@ -4,8 +4,10 @@ import { PalletManager } from "../sections/pallet-manager";
 import { CameraFeed, type SelectedPallet } from "../sections/camera-feed";
 import AddNewPallet from "../sections/add-new-pallet";
 
-export default function Home() {
-  const [selectedPallet, setSelectedPallet] = useState<SelectedPallet | null>(null);
+export default function DashboardPage() {
+  const [selectedPallet, setSelectedPallet] = useState<SelectedPallet | null>(
+    null,
+  );
   const [isCreatingPallet, setIsCreatingPallet] = useState(false);
   const isAdmin = false;
 
@@ -32,7 +34,7 @@ export default function Home() {
       {/* Right Column: Dynamic Camera View or Setup Form Panel */}
       <div className="flex flex-1 px-4 py-6 lg:px-8">
         {isCreatingPallet ? (
-          <AddNewPallet 
+          <AddNewPallet
             onCancel={() => setIsCreatingPallet(false)}
             onSave={(newData) => {
               console.log("New Pallet Payload Submitted:", newData);
@@ -40,10 +42,7 @@ export default function Home() {
             }}
           />
         ) : (
-          <CameraFeed 
-            isAdmin={isAdmin} 
-            selectedPallet={selectedPallet} 
-          />
+          <CameraFeed isAdmin={isAdmin} selectedPallet={selectedPallet} />
         )}
       </div>
     </main>

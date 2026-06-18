@@ -5,7 +5,9 @@ import { CameraFeed, type SelectedPallet } from "../sections/camera-feed";
 import AddNewPallet from "../sections/add-new-pallet"; // Don't forget to import this!
 
 export default function AdminPage() {
-  const [selectedPallet, setSelectedPallet] = useState<SelectedPallet | null>(null);
+  const [selectedPallet, setSelectedPallet] = useState<SelectedPallet | null>(
+    null,
+  );
   const [isCreatingPallet, setIsCreatingPallet] = useState(false);
 
   return (
@@ -31,7 +33,7 @@ export default function AdminPage() {
       {/* Right Column: Dynamic Camera View or Setup Form Panel */}
       <div className="flex flex-1 px-4 py-6 lg:px-8">
         {isCreatingPallet ? (
-          <AddNewPallet 
+          <AddNewPallet
             onCancel={() => setIsCreatingPallet(false)}
             onSave={(newData) => {
               console.log("Admin Dashboard - New Pallet Saved:", newData);
@@ -39,9 +41,10 @@ export default function AdminPage() {
             }}
           />
         ) : (
-          <CameraFeed 
+          <CameraFeed
             isAdmin={true} // Explicitly passes true to allow descriptions editing
-            selectedPallet={selectedPallet} 
+            selectedPallet={selectedPallet}
+            onUpdatePallet={setSelectedPallet}
           />
         )}
       </div>
