@@ -29,7 +29,8 @@ export function useLoginMutation() {
 
   return useMutation<LoginResponse, Error, LoginDto>({
     mutationFn: login,
-    onSuccess: () => {
+    onSuccess: (data) => {
+      queryClient.setQueryData(["user", String(data.user.id)], data.user);
       void queryClient.invalidateQueries({ queryKey: authKeys.user });
     },
   });

@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "@/client/services/api-config";
+
 export interface LoginDto {
   username: string;
   password: string;
@@ -13,6 +15,7 @@ export interface AuthUser {
   id: string | number;
   name: string;
   username: string;
+  role?: string;
 }
 
 export interface LoginResponse {
@@ -24,10 +27,6 @@ type ApiErrorResponse = {
   message?: string | string[];
   error?: string;
 };
-
-const API_BASE_URL = (
-  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000"
-).replace(/\/$/, "");
 
 const SIGNUP_ENDPOINT = `${API_BASE_URL}/auth/signup`;
 const LOGIN_ENDPOINT = `${API_BASE_URL}/auth/login`;

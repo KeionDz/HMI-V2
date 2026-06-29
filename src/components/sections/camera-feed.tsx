@@ -146,7 +146,7 @@ export function CameraFeed({
 
   const visibleCameras = isEditing
     ? editCameras
-    : selectedPallet?.cameras ?? [];
+    : (selectedPallet?.cameras ?? []);
   const selectedPalletAssignmentContext = selectedPallet
     ? {
         layerName: selectedPallet.layerName,
@@ -167,7 +167,9 @@ export function CameraFeed({
       <div className="h-[420px] shrink-0 rounded-xl border border-border/20 bg-[#1d2338] relative flex flex-col items-center justify-center text-center px-4">
         <div className="text-indigo-200/50 flex flex-col items-center">
           <VideoOff className="w-12 h-12 mb-4" strokeWidth={1.5} />
-          <p className="text-sm">Select a pallet location to activate the live camera</p>
+          <p className="text-sm">
+            Select a pallet location to activate the live camera
+          </p>
         </div>
         <button className="absolute bottom-4 right-4 flex items-center gap-1.5 text-xs font-medium text-indigo-200/50 hover:text-indigo-200 transition-colors">
           <RotateCcw className="w-3.5 h-3.5" />

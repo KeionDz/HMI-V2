@@ -21,6 +21,7 @@ export function Navbar() {
   const isAdminPage = pathname === "/admin"
   const isCameraManagementPage = pathname === "/camera-management"
   const isProtectedAdminPage = isAdminPage || isCameraManagementPage;
+  const homePath = isAdmin ? "/admin" : "/home";
   const navBaseClass =
     "flex items-center gap-2 px-4 py-2 rounded-lg border border-border/50 font-medium text-sm transition-colors";
   const navActiveClass =
@@ -65,9 +66,9 @@ export function Navbar() {
 
           <NavigationMenuItem>
             <Link
-              to="/home"
+              to={homePath}
               className={`${navBaseClass} ${
-                pathname === "/" || pathname === "/home" || pathname === "/dashboard"
+                pathname === "/" || pathname === "/home" || pathname === "/dashboard" || isAdminPage
                   ? navActiveClass
                   : navInactiveClass
               }`}
@@ -81,7 +82,7 @@ export function Navbar() {
           <NavigationMenuItem>
             <Link
               // Route to home or login page on logout, otherwise route to login
-              to={isProtectedAdminPage ? "/home" : "/login"}
+              to={isProtectedAdminPage ? "/home" : isAdmin ? "/admin" : "/login"}
               onClick={isProtectedAdminPage ? clearStoredAuthUserId : undefined}
               className={`${navBaseClass} ${
                 pathname === "/login" || isAdminPage
@@ -97,7 +98,7 @@ export function Navbar() {
               ) : (
                 <>
                   <Key className="w-4 h-4" />
-                  Admin
+                  {isAdmin ? "Dashboard" : "Admin"}
                 </>
               )}
             </Link>

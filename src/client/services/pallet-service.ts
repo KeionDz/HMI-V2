@@ -1,3 +1,5 @@
+import { API_BASE_URL } from "@/client/services/api-config";
+
 export interface CreatePalletDto {
   label: string;
   description: string;
@@ -19,10 +21,6 @@ type ApiErrorResponse = {
   message?: string | string[];
   error?: string;
 };
-
-const API_BASE_URL = (
-  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000"
-).replace(/\/$/, "");
 
 const CREATE_PALLET_ENDPOINT = `${API_BASE_URL}/pallet/create`;
 

@@ -1,6 +1,8 @@
+import { API_BASE_URL } from "@/client/services/api-config";
+
 export interface CreateUserDto {
   name: string;
-  email: string;
+  username: string;
   password: string;
   role: string;
 }
@@ -8,7 +10,7 @@ export interface CreateUserDto {
 export interface User {
   id: string | number;
   name: string;
-  email: string;
+  username: string;
   role: string;
   createdAt?: string;
   updatedAt?: string;
@@ -19,16 +21,17 @@ export interface CreateUserResponse {
   data: User;
 }
 
+interface UserResponse {
+  message: string;
+  data: User;
+}
+
 type ApiErrorResponse = {
   message?: string | string[];
   error?: string;
 };
 
-const API_BASE_URL = (
-  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:3000"
-).replace(/\/$/, "");
-
-const USERS_ENDPOINT = `${API_BASE_URL}/users`;
+const USERS_ENDPOINT = `${API_BASE_URL}/user`;
 
 async function getErrorMessage(response: Response) {
   try {
@@ -75,5 +78,6 @@ export async function getUserById(userId: string) {
   if (!response.ok) {
     throw new Error(await getErrorMessage(response));
   }
-  return (await response.json()) as User;
+  const body = (await response.json()) as UserResponse;
+  return body.data;
 }
