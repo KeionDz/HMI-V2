@@ -5,6 +5,7 @@ import PhotoStitchingPage from "@/components/pages/photostitching";
 import { RootLayout } from "@/components/layout/root-layout";
 import AdminPage from "@/components/pages/admin-page";
 import CameraManagementPage from "@/components/pages/camera-management-page";
+import RouteProtection from "@/lib/route-protection";
 
 export const router = createBrowserRouter([
   {
@@ -12,24 +13,37 @@ export const router = createBrowserRouter([
     element: <RootLayout />,
     children: [
       {
-        path: "dashboard",
+        index: true,
+        element: <Navigate to="/home" replace />,
+      },
+      {
+        path: "home",
         element: <DashboardPage />,
+      },
+      {
+        path: "dashboard",
+        element: <Navigate to="/home" replace />,
       },
       {
         path: "photo-stitching",
         element: <PhotoStitchingPage />,
       },
       {
-        path: "admin",
-        element: <AdminPage />,
-      },
-      {
-        path: "camera-management",
-        element: <CameraManagementPage />,
+        element: <RouteProtection />,
+        children: [
+          {
+            path: "admin",
+            element: <AdminPage />,
+          },
+          {
+            path: "camera-management",
+            element: <CameraManagementPage />,
+          },
+        ],
       },
       {
         path: "*",
-        element: <Navigate to="/" replace />,
+        element: <Navigate to="/home" replace />,
       },
     ],
   },

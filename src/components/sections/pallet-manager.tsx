@@ -127,9 +127,6 @@ export function PalletManager({ onPalletSelect, selectedPalletId, isAdmin = fals
     let interval: number;
 
     if (processingMode) {
-      setProgress(0);
-      
-      // 2. Explicitly append window. to your method call
       interval = window.setInterval(() => {
         setProgress((prev) => {
           if (prev >= 100) {
@@ -145,25 +142,26 @@ export function PalletManager({ onPalletSelect, selectedPalletId, isAdmin = fals
 
   function triggerProcess(mode: "load" | "retrieve") {
     if (!selectedPalletId) return;
+    setProgress(0);
     setProcessingMode(mode);
   }
 
   function handleProcessCompletion() {
     if (!selectedPalletId || !processingMode) return;
+    const nextActiveState = processingMode === "load";
 
     setPallets((prev) =>
       prev.map((p) => {
         if (p.id === selectedPalletId) {
-          return { ...p, active: processingMode === "load" };
+          return { ...p, active: nextActiveState };
         }
         return p;
       })
     );
 
-    // Refresh display references
     const updated = pallets.find((p) => p.id === selectedPalletId);
     if (updated) {
-      onPalletSelect(getSelectedPalletData(updated));
+      onPalletSelect(getSelectedPalletData({ ...updated, active: nextActiveState }));
     }
 
     setProcessingMode(null);

@@ -3,14 +3,24 @@ import {
   NavigationMenuItem,
   NavigationMenuList,
 } from "@/components/ui/navigation-menu"
+import { useGetUserByIdQuery } from "@/client/queries/user-queries"
+import {
+  clearStoredAuthUserId,
+  getStoredAuthUserId,
+} from "@/lib/auth-storage"
 import { Link, useLocation } from "react-router-dom"
 import { Camera, Home, Key, ImageIcon, LogOut } from "lucide-react"
 
 export function Navbar() {
   const { pathname } = useLocation();
+  const userId = getStoredAuthUserId();
+  const { data: user } = useGetUserByIdQuery(userId);
 
   //Check if user is logged in as admin
+  const isAdmin = user?.role?.toLowerCase() === "admin";
   const isAdminPage = pathname === "/admin"
+  const isCameraManagementPage = pathname === "/camera-management"
+  const isProtectedAdminPage = isAdminPage || isCameraManagementPage;
   const navBaseClass =
     "flex items-center gap-2 px-4 py-2 rounded-lg border border-border/50 font-medium text-sm transition-colors";
   const navActiveClass =
@@ -39,23 +49,25 @@ export function Navbar() {
             </Link>
           </NavigationMenuItem>
 
-          <NavigationMenuItem>
-            <Link
-              to="/camera-management"
-              className={`${navBaseClass} ${
-                pathname === "/camera-management" ? navActiveClass : navInactiveClass
-              }`}
-            >
-              <Camera className="w-4 h-4" />
-              Cameras
-            </Link>
-          </NavigationMenuItem>
+          {isAdmin && (
+            <NavigationMenuItem>
+              <Link
+                to="/camera-management"
+                className={`${navBaseClass} ${
+                  isCameraManagementPage ? navActiveClass : navInactiveClass
+                }`}
+              >
+                <Camera className="w-4 h-4" />
+                Cameras
+              </Link>
+            </NavigationMenuItem>
+          )}
 
           <NavigationMenuItem>
             <Link
-              to="/"
+              to="/home"
               className={`${navBaseClass} ${
-                pathname === "/" || pathname === "/dashboard"
+                pathname === "/" || pathname === "/home" || pathname === "/dashboard"
                   ? navActiveClass
                   : navInactiveClass
               }`}
@@ -69,14 +81,15 @@ export function Navbar() {
           <NavigationMenuItem>
             <Link
               // Route to home or login page on logout, otherwise route to login
-              to={isAdminPage ? "/" : "/login"}
+              to={isProtectedAdminPage ? "/home" : "/login"}
+              onClick={isProtectedAdminPage ? clearStoredAuthUserId : undefined}
               className={`${navBaseClass} ${
                 pathname === "/login" || isAdminPage
                   ? navActiveClass
                   : navInactiveClass
               }`}
             >
-              {isAdminPage ? (
+              {isProtectedAdminPage ? (
                 <>
                   <LogOut className="w-4 h-4" />
                   Logout

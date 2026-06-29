@@ -65,3 +65,15 @@ export async function createUser(createUserDto: CreateUserDto) {
 
   return (await response.json()) as CreateUserResponse;
 }
+
+export async function getUserById(userId: string) {
+  const response = await fetch(`${USERS_ENDPOINT}/${userId}`, {
+    method: "GET",
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    throw new Error(await getErrorMessage(response));
+  }
+  return (await response.json()) as User;
+}

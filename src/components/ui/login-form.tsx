@@ -26,16 +26,16 @@ const LoginForm = ({ form, onSubmit }: LoginFormProps) => {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             <FieldGroup className="gap-6">
               <Field>
-                <FieldLabel htmlFor="email">Username</FieldLabel>
+                <FieldLabel htmlFor="username">Username</FieldLabel>
                 <Input
                   className="h-10 px-3"
-                  id="email"
+                  id="username"
                   type="text"
-                  autoComplete="email"
-                  {...register("email")}
+                  autoComplete="username"
+                  {...register("username")}
                 />
-                {errors.email && (
-                  <FieldError>{errors.email.message}</FieldError>
+                {errors.username && (
+                  <FieldError>{errors.username.message}</FieldError>
                 )}
               </Field>
 

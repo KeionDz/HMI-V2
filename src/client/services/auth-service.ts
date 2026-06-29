@@ -1,18 +1,18 @@
 export interface LoginDto {
-  email: string;
+  username: string;
   password: string;
 }
 
 export interface SignUpDto {
   name: string;
-  email: string;
+  username: string;
   password: string;
 }
 
 export interface AuthUser {
   id: string | number;
   name: string;
-  email: string;
+  username: string;
 }
 
 export interface LoginResponse {
