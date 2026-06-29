@@ -5,6 +5,7 @@ export interface CreatePalletDto {
   palletCode: string;
   beginCell: string;
   endStation: string;
+  isActive: boolean;
   layerId: string;
 }
 

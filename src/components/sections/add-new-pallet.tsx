@@ -1,121 +1,226 @@
 import { useState } from "react";
-import { Camera, VideoOff } from "lucide-react";
 import { Label } from "@/components/ui/label";
-import { AddCameraRulesModal } from "@/components/ui/add-camera-rules-modal"; // Verify this path matches your directory setup
+import { Pencil, Plus, Trash2, X } from "lucide-react";
+import {
+  AddCameraForm,
+  type CameraFormData,
+} from "@/components/ui/add-camera-form";
+import { EditCameraForm } from "@/components/ui/edit-camera-form";
+import { DeleteCameraConfirmationModal } from "@/components/ui/delete-camera-confirmation-modal";
+
+type AddNewPalletFormData = {
+  label: string;
+  description: string;
+  beginCell: string;
+  endStation: string;
+  isActive: boolean;
+  cameras: CameraFormData[];
+};
 
 interface AddNewPalletProps {
   onCancel: () => void;
-  onSave?: (palletData: any) => void;
+  onSave?: (palletData: AddNewPalletFormData) => void;
 }
 
 export default function AddNewPallet({ onCancel, onSave }: AddNewPalletProps) {
-  const [locationId, setLocationId] = useState("001");
   const [label, setLabel] = useState("");
   const [description, setDescription] = useState("");
-  const [cameraUrl, setCameraUrl] = useState("");
-  const [previewActive, setPreviewActive] = useState(false);
-  
-  // 1. New local state to manage the Camera Rules setup modal layout display
-  const [cameraRulesModalOpen, setCameraRulesModalOpen] = useState(false);
+  const [beginCell, setBeginCell] = useState("");
+  const [endStation, setEndStation] = useState("");
+  const [isActive, setIsActive] = useState(false);
+  const [cameras, setCameras] = useState<CameraFormData[]>([]);
+  const [cameraModalMode, setCameraModalMode] = useState<"add" | "edit" | null>(
+    null,
+  );
+  const [editingCameraIndex, setEditingCameraIndex] = useState<number | null>(
+    null,
+  );
+  const [cameraPendingDeleteIndex, setCameraPendingDeleteIndex] = useState<
+    number | null
+  >(null);
 
   function handleSave(e: React.FormEvent) {
     e.preventDefault();
     if (onSave) {
-      onSave({ locationId, label, description, cameraUrl });
+      onSave({
+        label,
+        description,
+        beginCell,
+        endStation,
+        isActive,
+        cameras,
+      });
     }
   }
 
+  function handleOpenCameraModal() {
+    setEditingCameraIndex(null);
+    setCameraModalMode("add");
+  }
+
+  function handleOpenEditCameraModal(index: number) {
+    setEditingCameraIndex(index);
+    setCameraModalMode("edit");
+  }
+
+  function handleAddCamera(camerasToAdd: CameraFormData[]) {
+    setCameras((current) => [...current, ...camerasToAdd]);
+    setCameraModalMode(null);
+  }
+
+  function handleEditCamera(camera: CameraFormData) {
+    setCameras((current) =>
+      current.map((existingCamera, index) =>
+        index === editingCameraIndex ? camera : existingCamera,
+      ),
+    );
+    setEditingCameraIndex(null);
+    setCameraModalMode(null);
+  }
+
+  function handleConfirmRemoveCamera() {
+    if (cameraPendingDeleteIndex === null) return;
+    setCameras((current) =>
+      current.filter(
+        (_, cameraIndex) => cameraIndex !== cameraPendingDeleteIndex,
+      ),
+    );
+    setCameraPendingDeleteIndex(null);
+  }
+
+  function handleCloseCameraModal() {
+    setEditingCameraIndex(null);
+    setCameraModalMode(null);
+  }
+
   return (
-    <section className="flex flex-col w-full h-full gap-6">
+    <section className="flex flex-col w-full h-full min-h-0 gap-6">
       <h2 className="text-2xl font-bold tracking-tight">Add New Pallet</h2>
 
-      <form onSubmit={handleSave} className="flex flex-col flex-1 gap-4 overflow-y-auto pr-1">
-        <div className="space-y-1.5">
-          <Label className="text-sm font-medium text-zinc-400">Location ID</Label>
-          <input
-            type="text"
-            value={locationId}
-            onChange={(e) => setLocationId(e.target.value)}
-            className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-blue-500"
-            required
-          />
-        </div>
+      <form onSubmit={handleSave} className="flex min-h-0 flex-1 flex-col gap-4">
+        <div className="min-h-0 flex-1 space-y-4 overflow-y-auto pr-1">
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium text-zinc-400">Label</Label>
+            <input
+              type="text"
+              value={label}
+              placeholder="e.g., Pallet 01"
+              onChange={(e) => setLabel(e.target.value)}
+              className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-blue-500"
+              required
+            />
+          </div>
 
-        <div className="space-y-1.5">
-          <Label className="text-sm font-medium text-zinc-400">Label (Max 12 characters)</Label>
-          <input
-            type="text"
-            value={label}
-            maxLength={12}
-            placeholder="e.g., Pallet 01"
-            onChange={(e) => setLabel(e.target.value)}
-            className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-blue-500"
-            required
-          />
-        </div>
+          <div className="space-y-1.5">
+            <Label className="text-sm font-medium text-zinc-400">Description</Label>
+            <textarea
+              value={description}
+              rows={3}
+              placeholder="Enter pallet details..."
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-blue-500 resize-none"
+              required
+            />
+          </div>
 
-        <div className="space-y-1.5">
-          <Label className="text-sm font-medium text-zinc-400">Description (Max 100 characters)</Label>
-          <textarea
-            value={description}
-            maxLength={100}
-            rows={3}
-            placeholder="Enter pallet details..."
-            onChange={(e) => setDescription(e.target.value)}
-            className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-blue-500 resize-none"
-            required
-          />
-        </div>
-
-        <div className="space-y-1.5">
-          <Label className="text-sm font-medium text-zinc-400">Live Camera URL</Label>
-          <input
-            type="url"
-            value={cameraUrl}
-            placeholder="https://rtsp.stream/feed/..."
-            onChange={(e) => setCameraUrl(e.target.value)}
-            className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-blue-500"
-          />
-        </div>
-
-        {/* Video Preview Canvas Window */}
-        <div className="relative flex flex-col items-center justify-center border border-zinc-800 bg-[#1d2338] rounded-xl h-[240px] text-center px-4 mt-2">
-          {previewActive && cameraUrl ? (
-            <div className="text-blue-400 flex flex-col items-center gap-2">
-              <Camera className="w-8 h-8 animate-pulse" />
-              <p className="text-xs text-zinc-400">Displaying live feed preview...</p>
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium text-zinc-400">Begin Cell</Label>
+              <input
+                type="text"
+                value={beginCell}
+                placeholder="e.g., A1"
+                onChange={(e) => setBeginCell(e.target.value)}
+                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-blue-500"
+                required
+              />
             </div>
-          ) : (
-            <div className="text-indigo-200/50 flex flex-col items-center">
-              <VideoOff className="w-10 h-10 mb-2" strokeWidth={1.5} />
-              <p className="text-xs">Camera setup preview window</p>
-            </div>
-          )}
 
-          {/* Sub-navigation pill menu inside video view */}
-          <div className="absolute bottom-3 right-3 flex items-center bg-zinc-950 p-1 rounded-full border border-zinc-800 gap-1">
-            {/* 2. Added modal toggle switch trigger handling onto this tab action */}
-            <button
-              type="button"
-              onClick={() => setCameraRulesModalOpen(true)}
-              className="px-3 py-1 text-xs font-medium rounded-full bg-transparent text-zinc-400 hover:text-foreground transition-colors cursor-pointer"
-            >
-              Camera Rules
-            </button>
-            <button
-              type="button"
-              onClick={() => setPreviewActive(true)}
-              className={`px-3 py-1 text-xs font-medium rounded-full transition-colors cursor-pointer ${
-                previewActive ? "bg-zinc-700 text-foreground" : "text-zinc-400 hover:text-foreground"
-              }`}
-            >
-              Preview
-            </button>
+            <div className="space-y-1.5">
+              <Label className="text-sm font-medium text-zinc-400">End Station</Label>
+              <input
+                type="text"
+                value={endStation}
+                placeholder="e.g., Station 04"
+                onChange={(e) => setEndStation(e.target.value)}
+                className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-blue-500"
+                required
+              />
+            </div>
+          </div>
+
+          <label className="flex items-center justify-between gap-4 rounded-lg border border-zinc-800 bg-zinc-950/40 px-4 py-3">
+            <span className="text-sm font-medium text-zinc-300">Active</span>
+            <input
+              type="checkbox"
+              checked={isActive}
+              onChange={(e) => setIsActive(e.target.checked)}
+              className="h-4 w-4 rounded border-zinc-700 bg-zinc-900 accent-blue-600"
+            />
+          </label>
+
+          <div className="space-y-3 border-t border-zinc-800 pt-4">
+            <div className="flex items-center justify-between gap-3">
+              <h3 className="text-sm font-semibold text-zinc-300">Assigned Cameras</h3>
+              <button
+                type="button"
+                onClick={handleOpenCameraModal}
+                className="flex h-8 items-center gap-1.5 rounded-full border border-zinc-800 bg-black px-3 text-xs font-medium text-foreground transition-colors hover:bg-zinc-900"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Add Camera
+              </button>
+            </div>
+
+            {cameras.length === 0 ? (
+              <div className="rounded-lg border border-dashed border-zinc-800 bg-zinc-950/40 px-4 py-6 text-center text-sm text-zinc-500">
+                No cameras assigned.
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {cameras.map((camera, index) => (
+                  <div
+                    key={`${camera.id ?? camera.name}-${index}`}
+                    className="grid grid-cols-[1fr_auto] items-center gap-3 rounded-lg border border-zinc-800 bg-zinc-950/40 p-3"
+                  >
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-medium text-foreground">
+                        {camera.name}
+                      </div>
+                      <div className="truncate text-xs text-zinc-500">
+                        {camera.url}
+                      </div>
+                    </div>
+
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleOpenEditCameraModal(index)}
+                        aria-label="Edit camera"
+                        title="Edit camera"
+                        className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-800 bg-black text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-foreground"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setCameraPendingDeleteIndex(index)}
+                        aria-label="Remove camera"
+                        title="Remove camera"
+                        className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-800 bg-black text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-foreground"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Control Button Wrapper Footer */}
-        <div className="flex justify-start gap-3 pt-4 border-t border-zinc-800 mt-auto">
+        <div className="flex justify-start gap-3 border-t border-zinc-800 pt-4">
           <button
             type="button"
             onClick={onCancel}
@@ -132,14 +237,47 @@ export default function AddNewPallet({ onCancel, onSave }: AddNewPalletProps) {
         </div>
       </form>
 
-      {/* 3. Conditional injection gate mapping rule context modal overlay */}
-      {cameraRulesModalOpen && (
-        <AddCameraRulesModal
-          onClose={() => setCameraRulesModalOpen(false)}
-          onSave={(data) => {
-            console.log("Camera configurations saved to mock context payload:", data);
-            setCameraRulesModalOpen(false);
-          }}
+      {cameraModalMode && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-2xl animate-in zoom-in-95 duration-200">
+            <button
+              type="button"
+              onClick={handleCloseCameraModal}
+              aria-label="Close camera modal"
+              title="Close"
+              className="absolute right-4 top-4 rounded-full p-1 text-zinc-400 transition-colors hover:bg-zinc-900 hover:text-foreground"
+            >
+              <X className="h-4 w-4" />
+            </button>
+
+            <div className="mb-5 space-y-1">
+              <h3 className="text-lg font-bold tracking-tight text-foreground">
+                {cameraModalMode === "add" ? "Add Camera" : "Edit Camera"}
+              </h3>
+            </div>
+
+            {cameraModalMode === "add" ? (
+              <AddCameraForm
+                assignedCameras={cameras}
+                onCancel={handleCloseCameraModal}
+                onSubmit={handleAddCamera}
+              />
+            ) : editingCameraIndex !== null ? (
+              <EditCameraForm
+                camera={cameras[editingCameraIndex]}
+                onCancel={handleCloseCameraModal}
+                onSubmit={handleEditCamera}
+              />
+            ) : null}
+          </div>
+        </div>
+      )}
+
+      {cameraPendingDeleteIndex !== null && (
+        <DeleteCameraConfirmationModal
+          cameraName={cameras[cameraPendingDeleteIndex]?.name}
+          onClose={() => setCameraPendingDeleteIndex(null)}
+          onConfirm={handleConfirmRemoveCamera}
         />
       )}
     </section>

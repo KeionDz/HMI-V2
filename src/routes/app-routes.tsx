@@ -1,26 +1,44 @@
-import { createBrowserRouter } from "react-router-dom";
-import Home from "@/components/pages/home";
+import { Navigate, createBrowserRouter } from "react-router-dom";
+import DashboardPage from "@/components/pages/dashboard";
 import LoginPage from "@/components/pages/login-page";
 import PhotoStitchingPage from "@/components/pages/photostitching";
-import { RootLayout } from "@/components/layout/root-layout"; 
+import { RootLayout } from "@/components/layout/root-layout";
+import AdminPage from "@/components/pages/admin-page";
+import CameraManagementPage from "@/components/pages/camera-management-page";
 
 export const router = createBrowserRouter([
   {
     path: "/",
-    element: <RootLayout />, 
+    element: <RootLayout />,
     children: [
       {
-        path: "", 
-        element: <Home />,
+        path: "dashboard",
+        element: <DashboardPage />,
       },
       {
-        path: "photo-stitching", 
+        path: "photo-stitching",
         element: <PhotoStitchingPage />,
+      },
+      {
+        path: "admin",
+        element: <AdminPage />,
+      },
+      {
+        path: "camera-management",
+        element: <CameraManagementPage />,
+      },
+      {
+        path: "*",
+        element: <Navigate to="/" replace />,
       },
     ],
   },
   {
     path: "/login",
     element: <LoginPage />,
+  },
+  {
+    path: "*",
+    element: <Navigate to="/" replace />,
   },
 ]);

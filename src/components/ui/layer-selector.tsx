@@ -6,10 +6,20 @@ interface LayerSelectorProps {
   activeLayer: number;
   onLayerChange: (layer: number) => void;
   isAdmin?: boolean;
+  canDeleteLayer?: (layer: number) => boolean;
+  onBlockedDeleteLayer?: (layer: number) => void;
   onDeleteLayer?: (layer: number) => void;
 }
 
-export function LayerSelector({ layers, activeLayer, onLayerChange, isAdmin = false, onDeleteLayer }: LayerSelectorProps) {
+export function LayerSelector({
+  layers,
+  activeLayer,
+  onLayerChange,
+  isAdmin = false,
+  canDeleteLayer,
+  onBlockedDeleteLayer,
+  onDeleteLayer,
+}: LayerSelectorProps) {
   // Compute total pagination batches of 3
   const itemsPerPage = 3;
   const totalPages = Math.ceil(layers.length / itemsPerPage);
@@ -98,6 +108,7 @@ export function LayerSelector({ layers, activeLayer, onLayerChange, isAdmin = fa
       >
         {visibleLayers.map((layer) => {
           const isActive = layer === activeLayer;
+          const isLayerDeletable = canDeleteLayer ? canDeleteLayer(layer) : true;
           return (
             <button
               key={layer}
@@ -116,10 +127,22 @@ export function LayerSelector({ layers, activeLayer, onLayerChange, isAdmin = fa
                   role="button"
                   onClick={(e) => {
                     e.stopPropagation();
-                    onDeleteLayer(layer);
+                    if (isLayerDeletable) {
+                      onDeleteLayer(layer);
+                    } else {
+                      onBlockedDeleteLayer?.(layer);
+                    }
                   }}
-                  title="Delete layer"
-                  className="w-4 h-4 rounded-full bg-zinc-500 hover:bg-red-500 flex items-center justify-center transition-colors shrink-0"
+                  title={
+                    isLayerDeletable
+                      ? "Delete layer"
+                      : "Layer has active pallets"
+                  }
+                  className={`w-4 h-4 rounded-full flex items-center justify-center transition-colors shrink-0 ${
+                    isLayerDeletable
+                      ? "bg-zinc-500 hover:bg-red-500"
+                      : "bg-zinc-700 opacity-40 cursor-not-allowed"
+                  }`}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3">
                     <line x1="18" y1="6" x2="6" y2="18" />

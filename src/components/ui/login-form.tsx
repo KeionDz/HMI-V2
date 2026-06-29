@@ -31,7 +31,6 @@ const LoginForm = ({ form, onSubmit }: LoginFormProps) => {
                   className="h-10 px-3"
                   id="email"
                   type="text"
-                  placeholder="Enter admin username"
                   autoComplete="email"
                   {...register("email")}
                 />
@@ -46,7 +45,6 @@ const LoginForm = ({ form, onSubmit }: LoginFormProps) => {
                   className="h-10 px-3"
                   id="password"
                   type="password"
-                  placeholder="Enter admin password"
                   autoComplete="current-password"
                   {...register("password")}
                 />
@@ -56,12 +54,12 @@ const LoginForm = ({ form, onSubmit }: LoginFormProps) => {
               </Field>
             </FieldGroup>
             <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full h-10 rounded-full bg-blue-500 text-foreground font-medium text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed mt-2 cursor-pointer"
-              >
-                {isSubmitting ? "Logging in..." : "Login as Administrator"}
-              </button>
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full h-10 rounded-full bg-blue-500 text-foreground font-medium text-sm hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed mt-2 cursor-pointer"
+            >
+              {isSubmitting ? "Logging in..." : "Login as Administrator"}
+            </button>
           </form>
         </CardContent>
       </Card>

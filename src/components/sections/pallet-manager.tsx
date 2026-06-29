@@ -6,6 +6,9 @@ import { StatCard } from "@/components/ui/stat-card";
 import { type SelectedPallet } from "@/components/sections/camera-feed";
 import { AddLayerModal } from "@/components/ui/add-layer-modal";
 import { LayerSelector } from "@/components/ui/layer-selector";
+import { DeleteLayerConfirmationModal } from "@/components/ui/delete-layer-confirmation-modal";
+import { DeleteLayerBlockedModal } from "@/components/ui/delete-layer-blocked-modal";
+import { SYSTEM_CAMERA_OPTIONS } from "@/lib/system-cameras";
 
 const MOCK_PALLETS = [
   { id: 1,  layer: 1, name: "Pallet 1",  label: "Pallet 01", active: true,  description: "Standard euro-pallet loaded with automotive parts. Destination: Bay A3." },
@@ -46,6 +49,26 @@ const MOCK_PALLETS = [
   { id: 36, layer: 3, name: "Pallet 12", label: "Pallet 12", active: false, description: "Reserved — loading dock 4 conflict. Resolve before use." },
 ];
 
+type MockPallet = (typeof MOCK_PALLETS)[number];
+
+function getSelectedPalletData(pallet: MockPallet): SelectedPallet {
+  const palletNumber = ((pallet.id - 1) % 12) + 1;
+  const cameraStart = Math.floor((palletNumber - 1) / 4) * 2 + 1;
+  const firstCamera = SYSTEM_CAMERA_OPTIONS[cameraStart - 1];
+  const secondCamera = SYSTEM_CAMERA_OPTIONS[cameraStart];
+
+  return {
+    id: pallet.id,
+    layerName: `Layer ${pallet.layer}`,
+    label: pallet.label,
+    description: pallet.description,
+    beginCell: `Cell ${String(palletNumber).padStart(2, "0")}`,
+    endStation: `Station ${pallet.layer}`,
+    isActive: pallet.active,
+    cameras: [firstCamera, secondCamera],
+  };
+}
+
 interface PalletManagerProps {
   onPalletSelect: (pallet: SelectedPallet | null) => void;
   selectedPalletId: number | null;
@@ -57,6 +80,12 @@ export function PalletManager({ onPalletSelect, selectedPalletId, isAdmin = fals
   const [layers, setLayers] = useState([1, 2, 3]);
   const [activeLayer, setActiveLayer] = useState(1);
   const [addLayerModalOpen, setAddLayerModalOpen] = useState(false);
+  const [layerPendingDelete, setLayerPendingDelete] = useState<number | null>(
+    null,
+  );
+  const [blockedLayerDelete, setBlockedLayerDelete] = useState<number | null>(
+    null,
+  );
   const [pallets, setPallets] = useState(MOCK_PALLETS);
 
   // Modal animation tracking states
@@ -70,6 +99,14 @@ export function PalletManager({ onPalletSelect, selectedPalletId, isAdmin = fals
 
   const activePalletsCount = currentLayerPallets.filter((p) => p.active).length;
 
+  function canDeleteLayer(layer: number) {
+    return !pallets.some((p) => p.layer === layer && p.active);
+  }
+
+  function getActivePalletsCountByLayer(layer: number) {
+    return pallets.filter((p) => p.layer === layer && p.active).length;
+  }
+
   // Find currently selected pallet object context
   const selectedPallet = useMemo(
     () => pallets.find((p) => p.id === selectedPalletId) || null,
@@ -77,11 +114,11 @@ export function PalletManager({ onPalletSelect, selectedPalletId, isAdmin = fals
   );
 
   // FIX: Inactive items are now fully clickable
-  function handlePalletClick(pallet: (typeof MOCK_PALLETS)[number]) {
+  function handlePalletClick(pallet: MockPallet) {
     if (pallet.id === selectedPalletId) {
       onPalletSelect(null);
     } else {
-      onPalletSelect({ id: pallet.id, label: pallet.label, description: pallet.description });
+      onPalletSelect(getSelectedPalletData(pallet));
     }
   }
 
@@ -126,10 +163,7 @@ export function PalletManager({ onPalletSelect, selectedPalletId, isAdmin = fals
     // Refresh display references
     const updated = pallets.find((p) => p.id === selectedPalletId);
     if (updated) {
-      onPalletSelect({
-        ...updated,
-        description: updated.description
-      });
+      onPalletSelect(getSelectedPalletData(updated));
     }
 
     setProcessingMode(null);
@@ -156,6 +190,7 @@ export function PalletManager({ onPalletSelect, selectedPalletId, isAdmin = fals
 
   function handleDeleteLayer(layerToDelete: number) {
     if (layers.length === 1) return;
+    if (!canDeleteLayer(layerToDelete)) return;
     const updated = layers.filter((l) => l !== layerToDelete);
     setLayers(updated);
     setPallets((prev) => prev.filter((p) => p.layer !== layerToDelete));
@@ -196,7 +231,9 @@ export function PalletManager({ onPalletSelect, selectedPalletId, isAdmin = fals
             setActiveLayer(layerNum);
             onPalletSelect(null);
           }}
-          onDeleteLayer={handleDeleteLayer}
+          canDeleteLayer={canDeleteLayer}
+          onBlockedDeleteLayer={setBlockedLayerDelete}
+          onDeleteLayer={setLayerPendingDelete}
         />
 
         {isAdmin && (
@@ -282,6 +319,25 @@ export function PalletManager({ onPalletSelect, selectedPalletId, isAdmin = fals
           nextLayerNumber={layers.length + 1}
           onClose={() => setAddLayerModalOpen(false)}
           onConfirm={handleAddLayerConfirm}
+        />
+      )}
+
+      {layerPendingDelete !== null && (
+        <DeleteLayerConfirmationModal
+          layerNumber={layerPendingDelete}
+          onClose={() => setLayerPendingDelete(null)}
+          onConfirm={() => {
+            handleDeleteLayer(layerPendingDelete);
+            setLayerPendingDelete(null);
+          }}
+        />
+      )}
+
+      {blockedLayerDelete !== null && (
+        <DeleteLayerBlockedModal
+          layerNumber={blockedLayerDelete}
+          activePalletsCount={getActivePalletsCountByLayer(blockedLayerDelete)}
+          onClose={() => setBlockedLayerDelete(null)}
         />
       )}
 
