@@ -7,6 +7,7 @@ interface LayerSelectorProps {
   onLayerChange: (layer: number) => void;
   isAdmin?: boolean;
   canDeleteLayer?: (layer: number) => boolean;
+  onBlockedDeleteLayer?: (layer: number) => void;
   onDeleteLayer?: (layer: number) => void;
 }
 
@@ -16,6 +17,7 @@ export function LayerSelector({
   onLayerChange,
   isAdmin = false,
   canDeleteLayer,
+  onBlockedDeleteLayer,
   onDeleteLayer,
 }: LayerSelectorProps) {
   // Compute total pagination batches of 3
@@ -127,6 +129,8 @@ export function LayerSelector({
                     e.stopPropagation();
                     if (isLayerDeletable) {
                       onDeleteLayer(layer);
+                    } else {
+                      onBlockedDeleteLayer?.(layer);
                     }
                   }}
                   title={

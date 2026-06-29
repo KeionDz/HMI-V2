@@ -4,6 +4,7 @@ import LoginPage from "@/components/pages/login-page";
 import PhotoStitchingPage from "@/components/pages/photostitching";
 import { RootLayout } from "@/components/layout/root-layout";
 import AdminPage from "@/components/pages/admin-page";
+import CameraManagementPage from "@/components/pages/camera-management-page";
 
 export const router = createBrowserRouter([
   {
@@ -21,6 +22,10 @@ export const router = createBrowserRouter([
       {
         path: "admin",
         element: <AdminPage />,
+      },
+      {
+        path: "camera-management",
+        element: <CameraManagementPage />,
       },
       {
         path: "*",

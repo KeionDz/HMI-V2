@@ -29,7 +29,9 @@ export default function AddNewPallet({ onCancel, onSave }: AddNewPalletProps) {
   const [endStation, setEndStation] = useState("");
   const [isActive, setIsActive] = useState(false);
   const [cameras, setCameras] = useState<CameraFormData[]>([]);
-  const [cameraModalOpen, setCameraModalOpen] = useState(false);
+  const [cameraModalMode, setCameraModalMode] = useState<"add" | "edit" | null>(
+    null,
+  );
   const [editingCameraIndex, setEditingCameraIndex] = useState<number | null>(
     null,
   );
@@ -53,17 +55,17 @@ export default function AddNewPallet({ onCancel, onSave }: AddNewPalletProps) {
 
   function handleOpenCameraModal() {
     setEditingCameraIndex(null);
-    setCameraModalOpen(true);
+    setCameraModalMode("add");
   }
 
   function handleOpenEditCameraModal(index: number) {
     setEditingCameraIndex(index);
-    setCameraModalOpen(true);
+    setCameraModalMode("edit");
   }
 
-  function handleAddCamera(camera: CameraFormData) {
-    setCameras((current) => [...current, camera]);
-    setCameraModalOpen(false);
+  function handleAddCamera(camerasToAdd: CameraFormData[]) {
+    setCameras((current) => [...current, ...camerasToAdd]);
+    setCameraModalMode(null);
   }
 
   function handleEditCamera(camera: CameraFormData) {
@@ -73,7 +75,7 @@ export default function AddNewPallet({ onCancel, onSave }: AddNewPalletProps) {
       ),
     );
     setEditingCameraIndex(null);
-    setCameraModalOpen(false);
+    setCameraModalMode(null);
   }
 
   function handleConfirmRemoveCamera() {
@@ -88,7 +90,7 @@ export default function AddNewPallet({ onCancel, onSave }: AddNewPalletProps) {
 
   function handleCloseCameraModal() {
     setEditingCameraIndex(null);
-    setCameraModalOpen(false);
+    setCameraModalMode(null);
   }
 
   return (
@@ -178,7 +180,7 @@ export default function AddNewPallet({ onCancel, onSave }: AddNewPalletProps) {
               <div className="space-y-2">
                 {cameras.map((camera, index) => (
                   <div
-                    key={`${camera.name}-${index}`}
+                    key={`${camera.id ?? camera.name}-${index}`}
                     className="grid grid-cols-[1fr_auto] items-center gap-3 rounded-lg border border-zinc-800 bg-zinc-950/40 p-3"
                   >
                     <div className="min-w-0">
@@ -235,7 +237,7 @@ export default function AddNewPallet({ onCancel, onSave }: AddNewPalletProps) {
         </div>
       </form>
 
-      {cameraModalOpen && (
+      {cameraModalMode && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 px-4 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="relative w-full max-w-md rounded-2xl border border-zinc-800 bg-zinc-950 p-6 shadow-2xl animate-in zoom-in-95 duration-200">
             <button
@@ -250,22 +252,23 @@ export default function AddNewPallet({ onCancel, onSave }: AddNewPalletProps) {
 
             <div className="mb-5 space-y-1">
               <h3 className="text-lg font-bold tracking-tight text-foreground">
-                {editingCameraIndex === null ? "Add Camera" : "Edit Camera"}
+                {cameraModalMode === "add" ? "Add Camera" : "Edit Camera"}
               </h3>
             </div>
 
-            {editingCameraIndex === null ? (
+            {cameraModalMode === "add" ? (
               <AddCameraForm
+                assignedCameras={cameras}
                 onCancel={handleCloseCameraModal}
                 onSubmit={handleAddCamera}
               />
-            ) : (
+            ) : editingCameraIndex !== null ? (
               <EditCameraForm
                 camera={cameras[editingCameraIndex]}
                 onCancel={handleCloseCameraModal}
                 onSubmit={handleEditCamera}
               />
-            )}
+            ) : null}
           </div>
         </div>
       )}

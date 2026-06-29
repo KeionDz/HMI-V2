@@ -7,6 +7,8 @@ import { type SelectedPallet } from "@/components/sections/camera-feed";
 import { AddLayerModal } from "@/components/ui/add-layer-modal";
 import { LayerSelector } from "@/components/ui/layer-selector";
 import { DeleteLayerConfirmationModal } from "@/components/ui/delete-layer-confirmation-modal";
+import { DeleteLayerBlockedModal } from "@/components/ui/delete-layer-blocked-modal";
+import { SYSTEM_CAMERA_OPTIONS } from "@/lib/system-cameras";
 
 const MOCK_PALLETS = [
   { id: 1,  layer: 1, name: "Pallet 1",  label: "Pallet 01", active: true,  description: "Standard euro-pallet loaded with automotive parts. Destination: Bay A3." },
@@ -52,24 +54,18 @@ type MockPallet = (typeof MOCK_PALLETS)[number];
 function getSelectedPalletData(pallet: MockPallet): SelectedPallet {
   const palletNumber = ((pallet.id - 1) % 12) + 1;
   const cameraStart = Math.floor((palletNumber - 1) / 4) * 2 + 1;
+  const firstCamera = SYSTEM_CAMERA_OPTIONS[cameraStart - 1];
+  const secondCamera = SYSTEM_CAMERA_OPTIONS[cameraStart];
 
   return {
     id: pallet.id,
+    layerName: `Layer ${pallet.layer}`,
     label: pallet.label,
     description: pallet.description,
     beginCell: `Cell ${String(palletNumber).padStart(2, "0")}`,
     endStation: `Station ${pallet.layer}`,
     isActive: pallet.active,
-    cameras: [
-      {
-        name: `Camera ${cameraStart}`,
-        url: `rtsp://camera-${cameraStart}/stream`,
-      },
-      {
-        name: `Camera ${cameraStart + 1}`,
-        url: `rtsp://camera-${cameraStart + 1}/stream`,
-      },
-    ],
+    cameras: [firstCamera, secondCamera],
   };
 }
 
@@ -87,6 +83,9 @@ export function PalletManager({ onPalletSelect, selectedPalletId, isAdmin = fals
   const [layerPendingDelete, setLayerPendingDelete] = useState<number | null>(
     null,
   );
+  const [blockedLayerDelete, setBlockedLayerDelete] = useState<number | null>(
+    null,
+  );
   const [pallets, setPallets] = useState(MOCK_PALLETS);
 
   // Modal animation tracking states
@@ -102,6 +101,10 @@ export function PalletManager({ onPalletSelect, selectedPalletId, isAdmin = fals
 
   function canDeleteLayer(layer: number) {
     return !pallets.some((p) => p.layer === layer && p.active);
+  }
+
+  function getActivePalletsCountByLayer(layer: number) {
+    return pallets.filter((p) => p.layer === layer && p.active).length;
   }
 
   // Find currently selected pallet object context
@@ -229,6 +232,7 @@ export function PalletManager({ onPalletSelect, selectedPalletId, isAdmin = fals
             onPalletSelect(null);
           }}
           canDeleteLayer={canDeleteLayer}
+          onBlockedDeleteLayer={setBlockedLayerDelete}
           onDeleteLayer={setLayerPendingDelete}
         />
 
@@ -326,6 +330,14 @@ export function PalletManager({ onPalletSelect, selectedPalletId, isAdmin = fals
             handleDeleteLayer(layerPendingDelete);
             setLayerPendingDelete(null);
           }}
+        />
+      )}
+
+      {blockedLayerDelete !== null && (
+        <DeleteLayerBlockedModal
+          layerNumber={blockedLayerDelete}
+          activePalletsCount={getActivePalletsCountByLayer(blockedLayerDelete)}
+          onClose={() => setBlockedLayerDelete(null)}
         />
       )}
 

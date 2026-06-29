@@ -20,6 +20,7 @@ import { SavePalletChangesConfirmationModal } from "@/components/ui/save-pallet-
 
 export interface SelectedPallet {
   id: number;
+  layerName: string;
   label: string;
   description: string;
   beginCell: string;
@@ -113,8 +114,8 @@ export function CameraFeed({
     setCameraModalOpen(true);
   }
 
-  function handleAddCamera(camera: CameraFormData) {
-    setEditCameras((current) => [...current, camera]);
+  function handleAddCamera(camerasToAdd: CameraFormData[]) {
+    setEditCameras((current) => [...current, ...camerasToAdd]);
     setCameraModalOpen(false);
   }
 
@@ -146,6 +147,12 @@ export function CameraFeed({
   const visibleCameras = isEditing
     ? editCameras
     : selectedPallet?.cameras ?? [];
+  const selectedPalletAssignmentContext = selectedPallet
+    ? {
+        layerName: selectedPallet.layerName,
+        palletLabel: selectedPallet.label,
+      }
+    : undefined;
 
   return (
     <section className="flex flex-col w-full h-full min-h-0 gap-6">
@@ -306,7 +313,7 @@ export function CameraFeed({
                   <div className="space-y-2">
                     {visibleCameras.map((camera, index) => (
                       <div
-                        key={`${camera.name}-${index}`}
+                        key={`${camera.id ?? camera.name}-${index}`}
                         className="grid grid-cols-[1fr_auto] items-center gap-3 rounded-lg border border-zinc-800 bg-zinc-950/40 p-3"
                       >
                         <div className="min-w-0">
@@ -403,6 +410,8 @@ export function CameraFeed({
 
             {editingCameraIndex === null ? (
               <AddCameraForm
+                assignmentContext={selectedPalletAssignmentContext}
+                assignedCameras={editCameras}
                 onCancel={handleCloseCameraModal}
                 onSubmit={handleAddCamera}
               />

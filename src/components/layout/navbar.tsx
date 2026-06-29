@@ -4,13 +4,19 @@ import {
   NavigationMenuList,
 } from "@/components/ui/navigation-menu"
 import { Link, useLocation } from "react-router-dom"
-import { Home, Key, ImageIcon, LogOut } from "lucide-react"
+import { Camera, Home, Key, ImageIcon, LogOut } from "lucide-react"
 
 export function Navbar() {
   const { pathname } = useLocation();
 
   //Check if user is logged in as admin
   const isAdminPage = pathname === "/admin"
+  const navBaseClass =
+    "flex items-center gap-2 px-4 py-2 rounded-lg border border-border/50 font-medium text-sm transition-colors";
+  const navActiveClass =
+    "bg-blue-600 border-blue-500 text-white hover:bg-blue-700";
+  const navInactiveClass =
+    "bg-transparent text-foreground hover:bg-zinc-900 hover:text-white";
 
   return (
     <header className="flex w-full items-center justify-between px-10 py-6 bg-background">
@@ -24,8 +30,9 @@ export function Navbar() {
           <NavigationMenuItem>
             <Link
               to="/photo-stitching"
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg border border-border/50 font-medium text-sm transition-colors
-                ${pathname === "/photo-stitching" ? "bg-muted text-foreground" : "bg-transparent text-foreground hover:bg-muted/50"}`}
+              className={`${navBaseClass} ${
+                pathname === "/photo-stitching" ? navActiveClass : navInactiveClass
+              }`}
             >
               <ImageIcon className="w-4 h-4" />
               Photo Stitching
@@ -34,9 +41,24 @@ export function Navbar() {
 
           <NavigationMenuItem>
             <Link
+              to="/camera-management"
+              className={`${navBaseClass} ${
+                pathname === "/camera-management" ? navActiveClass : navInactiveClass
+              }`}
+            >
+              <Camera className="w-4 h-4" />
+              Cameras
+            </Link>
+          </NavigationMenuItem>
+
+          <NavigationMenuItem>
+            <Link
               to="/"
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg border border-border/50 font-medium text-sm transition-colors
-                ${pathname === "/" ? "bg-chart-5 text-foreground" : "bg-transparent text-foreground hover:bg-muted/50"}`}
+              className={`${navBaseClass} ${
+                pathname === "/" || pathname === "/dashboard"
+                  ? navActiveClass
+                  : navInactiveClass
+              }`}
             >
               <Home className="w-4 h-4" />
               Home
@@ -48,11 +70,11 @@ export function Navbar() {
             <Link
               // Route to home or login page on logout, otherwise route to login
               to={isAdminPage ? "/" : "/login"}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg border border-border/50 font-medium text-sm transition-colors
-                ${pathname === "/login" || isAdminPage 
-                  ? "bg-foreground text-background hover:bg-foreground/80" 
-                  : "bg-transparent text-foreground hover:bg-muted/50 border-border/50"
-                }`}
+              className={`${navBaseClass} ${
+                pathname === "/login" || isAdminPage
+                  ? navActiveClass
+                  : navInactiveClass
+              }`}
             >
               {isAdminPage ? (
                 <>
